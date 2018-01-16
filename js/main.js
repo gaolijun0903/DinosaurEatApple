@@ -1,7 +1,7 @@
 // 实际应用场景改为window.innerWidth和window.innerHeight。
 // 这里是为了方便查看示例。
-var width = 320;  
-var height = 568; 
+var width = window.innerWidth;  
+var height = window.innerHeight; 
 
 // 创建游戏实例
 var game = new Phaser.Game(width, height, Phaser.AUTO, '#game');
@@ -12,7 +12,7 @@ var states = {
     preload: function() {
     	this.preload = function() {
 	        // 设置背景为黑色
-	        game.stage.backgroundColor = '#000000';
+	        game.stage.backgroundColor = '#FFFFFF';
 	        // 加载游戏资源
 	        game.load.crossOrigin = 'anonymous'; // 设置跨域
 	        game.load.image('bg', 'images/bg.png');
@@ -30,7 +30,7 @@ var states = {
 	        // 添加进度文字
             var progressText = game.add.text(game.world.centerX, game.world.centerY, '0%', {
                 fontSize: '60px',
-                fill: '#ffffff'
+                fill: '#eee'
             });
             progressText.anchor.setTo(0.5, 0.5);
             // 监听加载完一个文件的事件
@@ -54,10 +54,7 @@ var states = {
         			setTimeout(onLoad, 1000);
             	}
             }
-	    },
-    	this.create = function() {
-        	//game.state.start('created');
-        }
+	    }
     },
     // 开始场景
     created: function() {
@@ -106,8 +103,10 @@ var states = {
 			game.physics.startSystem(Phaser.Physics.Arcade);
 			game.physics.arcade.gravity.y = 300;
             // 添加背景音乐
-            bgMusic = game.add.audio('bgMusic');
-            bgMusic.loopFull();
+            if (!bgMusic) {
+                bgMusic = game.add.audio('bgMusic');
+                bgMusic.loopFull();
+            }
             // 缓存其他音乐
             scoreMusic = game.add.audio('scoreMusic');
             bombMusic = game.add.audio('bombMusic');
