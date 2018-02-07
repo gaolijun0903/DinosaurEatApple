@@ -1,5 +1,5 @@
-// addMoveCallback滑动监听设置位置
-// 这里是为了方便查看示例。
+// moveToXY()  moveToPointer() 
+// 添加静音按钮旋转效果angularVelocity
 var width = window.innerWidth;  
 var height = window.innerHeight; 
 
@@ -24,6 +24,7 @@ var states = {
 	        game.load.image('five', 'images/five.png');
 	        game.load.image('three', 'images/three.png');
 	        game.load.image('one', 'images/one.png');
+	        game.load.spritesheet('mute-play', 'images/mute-play.png', 32, 23); //游戏页-静音及播放
 	        game.load.audio('bgMusic', 'audio/bgMusic.mp3');
 	        game.load.audio('scoreMusic', 'audio/addscore.mp3');
             game.load.audio('bombMusic', 'audio/boom.mp3');
@@ -46,16 +47,17 @@ var states = {
             },3000);
             // 加载完毕回调方法
             function onLoad() {
-            	if(deadline){
+            	game.state.start('created');
+            	/*if(deadline){
             		// 已到达最小展示时间，可以进入下一个场景
         			game.state.start('created');
             	}else{
             		// 还没有到最小展示时间，1秒后重试
         			setTimeout(onLoad, 1000);
-            	}
+            	}*/
             }
 	    }
-    },
+    },                                                                          
     // 开始场景
     created: function() {
     	this.create = function() {
@@ -97,11 +99,15 @@ var states = {
         	scoreMusic,
         	bombMusic,
         	bgMusic;
+        	
+        this.rotateV=100; //静音按钮转速
     	this.create = function() {
             score = 0;
             // 开启物理引擎
 			game.physics.startSystem(Phaser.Physics.Arcade);
 			game.physics.arcade.gravity.y = 300;
+			// 声音管理类 
+    		this.soundManager = game.sound;
             // 添加背景音乐
             if (!bgMusic) {
                 bgMusic = game.add.audio('bgMusic');
@@ -129,14 +135,36 @@ var states = {
                 fill: '#f2bb15'
             });
             title.anchor.setTo(0.5, 0.5);
+            
+            // 添加静音按钮  播放
+	        muteButton = game.add.sprite(game.world.width-100, 100, 'mute-play' );
+	        muteButton.scale.set(3);
+	        muteButton.anchor.setTo(0.5, 0.5);
+	        muteButton.animations.add('mute', [0], 10, true);
+	        muteButton.animations.add('play', [1], 10, true);
+	        muteButton.play('play');
+	        muteButton.inputEnabled = true;
+	        game.physics.enable(muteButton); // 加入物理运动
+	        muteButton.body.allowGravity = false; // 清除重力影响
+	        muteButton.events.onInputDown.add(function(pointer) {
+	        	this.soundManager.mute =  !this.soundManager.mute;
+	        	if(this.soundManager.mute){
+	        		muteButton.play('mute');
+	        		this.rotateV = 0
+	        	}else{
+	        		muteButton.play('play');
+	        		this.rotateV = 200;
+	        	}
+	        },this)
+	        
             // 是否正在触摸
 			var touching = false;
 			// 监听按下事件
 			game.input.onDown.add(function(pointer) {
 			    // 要判断是否点住主角，避免瞬移
-    			if (Math.abs(pointer.x - man.x) < man.width / 2 && Math.abs(pointer.y - man.y) < man.height / 2){
+    			/*if (Math.abs(pointer.x - man.x) < man.width / 2 && Math.abs(pointer.y - man.y) < man.height / 2){
     				touching = true;
-    			} 
+    			} */
 			},this);
 			// 监听离开事件
 			game.input.onUp.add(function() {
@@ -176,6 +204,10 @@ var states = {
 			appleTimer.start();
         },
         this.update = function() {
+        	muteButton.body.angularVelocity = this.rotateV;
+        	
+        	//game.physics.arcade.moveToPointer(man, 60, game.input.activePointer, 100);
+        	game.physics.arcade.moveToXY(man, game.input.activePointer.x,game.world.height * 0.75,60, 50);
 		    // 监听接触事件
 		    game.physics.arcade.overlap(man, apples, pickApple, null, this);
 		}

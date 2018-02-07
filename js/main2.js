@@ -1,4 +1,4 @@
-// addMoveCallback滑动监听设置位置
+// moveToXY()  moveToPointer() 
 // 这里是为了方便查看示例。
 var width = window.innerWidth;  
 var height = window.innerHeight; 
@@ -133,10 +133,11 @@ var states = {
 			var touching = false;
 			// 监听按下事件
 			game.input.onDown.add(function(pointer) {
+				
 			    // 要判断是否点住主角，避免瞬移
-    			if (Math.abs(pointer.x - man.x) < man.width / 2 && Math.abs(pointer.y - man.y) < man.height / 2){
+    			/*if (Math.abs(pointer.x - man.x) < man.width / 2 && Math.abs(pointer.y - man.y) < man.height / 2){
     				touching = true;
-    			} 
+    			} */
 			},this);
 			// 监听离开事件
 			game.input.onUp.add(function() {
@@ -169,15 +170,19 @@ var states = {
 				apple.body.onWorldBounds.add(function(apple, up, down, left, right) {
 				    if (down) {
 				        apple.kill();//炸弹掉落地面直接消失，不结束游戏
-				        if (apple.type !== 'bomb') game.state.start('over', true, false, score);
+				        //if (apple.type !== 'bomb') game.state.start('over', true, false, score);
 				    }
 				});
 			});
 			appleTimer.start();
         },
         this.update = function() {
+        	//game.physics.arcade.moveToPointer(man, 60, game.input.activePointer, 100);
+        	game.physics.arcade.moveToXY(man, game.input.activePointer.x,game.world.height * 0.75,60, 50);
+        	
+        	//moveToXY(displayObject, x, y, speed, maxTime) 
 		    // 监听接触事件
-		    game.physics.arcade.overlap(man, apples, pickApple, null, this);
+		    //game.physics.arcade.overlap(man, apples, pickApple, null, this);
 		}
         // 接触事件
 		function pickApple(man, apple) {
