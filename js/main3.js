@@ -1,5 +1,5 @@
 // moveToXY()  moveToPointer() 
-// 添加静音按钮旋转效果angularVelocity
+// 添加静音按钮旋转效果  angularVelocity
 var width = window.innerWidth;  
 var height = window.innerHeight; 
 
